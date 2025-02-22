@@ -1,0 +1,41 @@
+@{
+  ViewData["Title"] = "User List";
+  Layout = "_AdminLayout";
+}
+<h2 class="text-center">Danh sách người dùng</h2>
+@* Search Form *@
+<form asp-action="Index" method="get" class="form-inline mb-3">
+  <input type="text" name="searchString" class="form-control mr-sm-2" placeholder="Search users..."
+    value="@ViewData["CurrentFilter"]" />
+  <button type="submit" class="btn btn-outline-success">Search</button>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Họ tên</th>
+      <th>Email</th>
+      <th>Số điện thoại</th>
+      <th>Địa chỉ</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var user in Model)
+    {
+      <tr>
+        <td>@user.Id</td>
+        <td>@user.UserName</td>
+        <td>@user.Email</td>
+        <td>@user.FullName</td>
+        <td>@user.PhoneNumber</td>
+        <td>@user.Address</td>
+        <td>
+          <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-primary">Edit</a>
+          <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Delete</a>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

@@ -1,0 +1,81 @@
+@using QuanLySoTietKiem.Models.SoSanhGoiTietKiem
+@model SoSanhGoiTietKiemModel
+
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h3 class="card-title mb-0">So sánh các gói tiết kiệm</h3>
+    </div>
+    <div class="card-body">
+      <form asp-action="SoSanhGoiTietKiem" method="post">
+        <div class="form-group mb-4">
+          <label asp-for="SoTienDuKienGui">Số tiền dự kiến gửi</label>
+          <div class="input-group">
+            <input asp-for="SoTienDuKienGui" class="form-control money-input" />
+            <span class="input-group-text">VNĐ</span>
+          </div>
+          <span asp-validation-for="SoTienDuKienGui" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">So sánh các gói</button>
+      </form>
+
+      @if (Model.DanhSachGoi.Any())
+      {
+        <div class="mt-4">
+          <h4>Kết quả so sánh</h4>
+          <div class="row">
+            @foreach (var goi in Model.DanhSachGoi)
+            {
+              <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">@goi.MoTa</h5>
+                  </div>
+                  <div class="card-body">
+                    <p><strong>Lãi suất:</strong> @goi.LaiSuat%/năm</p>
+                    <p><strong>Tiền lãi dự kiến:</strong> @goi.TienLaiDuKien.ToString("N0") VNĐ</p>
+                    <p><strong>Tổng tiền nhận được:</strong> @goi.TongTienNhanDuoc.ToString("N0") VNĐ</p>
+
+                    <h6 class="text-success">Ưu điểm:</h6>
+                    <ul class="list-unstyled">
+                      @foreach (var uuDiem in goi.UuDiem)
+                      {
+                        <li><i class="fas fa-check text-success"></i> @uuDiem</li>
+                      }
+                    </ul>
+
+                    <h6 class="text-danger">Nhược điểm:</h6>
+                    <ul class="list-unstyled">
+                      @foreach (var nhuocDiem in goi.NhuocDiem)
+                      {
+                        <li><i class="fas fa-times text-danger"></i> @nhuocDiem</li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    $(document).ready(function () {
+      $('.money-input').on('input', function () {
+        let value = $(this).val().replace(/\D/g, '');
+        $(this).val(new Intl.NumberFormat('vi-VN').format(value));
+      });
+
+      $('form').on('submit', function () {
+        $('.money-input').each(function () {
+          $(this).val($(this).val().replace(/\D/g, ''));
+        });
+      });
+    });
+  </script>
+}

@@ -1,0 +1,50 @@
+<style>
+  .nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+  }
+</style>
+<ul class="nav flex-column mt-3">
+  <li class="nav-item">
+    <a asp-controller="Admin" asp-action="Dashboard" class="nav-link">
+      <i class="bi bi-house"></i>
+      <span>Trang quản trị</span>
+    </a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      <i class="bi bi-file-earmark-text"></i>
+      <span>Báo cáo</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="reportDropdown">
+      <li>
+        <a class="dropdown-item" asp-controller="Admin" asp-action="ReportByDay">Báo cáo ngày</a>
+      </li>
+      <li>
+        <a class="dropdown-item" asp-controller="Admin" asp-action="ReportByMonth">
+          Báo cáo tháng
+        </a>
+      </li>
+
+    </ul>
+    @* Quản lý người dùng *@
+    @* <li class="nav-item">
+    <a asp-controller="Admin" asp-action="UserList" class="nav-link">
+      <i class="bi bi-person"></i>
+      <span>User Management</span>
+    </a>
+  </li> *@
+    @* Phân quyền *@
+    @* <li class="nav-item">
+    <a asp-controller="Admin" asp-action="RoleManagement" class="nav-link">
+      <i class="bi bi-person"></i>
+      <span>Role Management</span>
+    </a>
+  </li> *@
+  <li class="nav-item">
+    <a asp-controller="Admin" asp-action="RoleManagement" class="nav-link">
+      <i class="bi bi-person"></i>
+      <span>Thay đổi lãi xuất</span>
+    </a>
+  </li>
+</ul>

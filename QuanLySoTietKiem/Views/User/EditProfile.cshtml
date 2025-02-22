@@ -1,0 +1,60 @@
+@model QuanLySoTietKiem.Models.ApplicationUser
+@{
+  ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
+  Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-pencil-fill fa-2x me-2"></i>
+            <h3 class="mb-0">Chỉnh sửa thông tin cá nhân</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          @using (Html.BeginForm("EditProfile", "User", FormMethod.Post))
+          {
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+              <label class="form-label fw-bold text-success">
+                <i class="bi bi-person-fill me-2">
+
+                </i>Họ và tên
+              </label>
+              @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-success">
+                <i class="bi bi-envelope-fill me-2"></i>Email
+              </label>
+              @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-success">
+                <i class="bi bi-geo-alt-fill me-2"></i>Địa chỉ
+              </label>
+              @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-success">
+                <i class="bi bi-telephone-fill me-2"></i>Số điện thoại
+              </label>
+              @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-save me-2"></i>Lưu thay đổi
+              </button>
+              <a asp-action="Profile" asp-controller="User" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Trở về trang cá nhân
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Sổ Tiết Kiệm Online";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/pages/home.css" />
+
+@await Html.PartialAsync("Sections/Home/_HeroSection")
+@await Html.PartialAsync("Sections/Home/_StatsSection")
+@await Html.PartialAsync("Sections/Home/_FeaturesSection")
+@await Html.PartialAsync("Sections/Home/_CTASection")   
+

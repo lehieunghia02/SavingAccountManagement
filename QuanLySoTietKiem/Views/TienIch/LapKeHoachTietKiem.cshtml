@@ -1,0 +1,95 @@
+@using QuanLySoTietKiem.Models.SoSanhGoiTietKiem
+@model KeHoachTietKiemModel
+
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h3 class="card-title mb-0">Lập kế hoạch tiết kiệm</h3>
+    </div>
+    <div class="card-body">
+      <form asp-action="LapKeHoachTietKiem" method="post">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label asp-for="MucTieuTietKiem">Mục tiêu tiết kiệm</label>
+              <div class="input-group">
+                <input asp-for="MucTieuTietKiem" class="form-control money-input" />
+                <span class="input-group-text">VNĐ</span>
+              </div>
+              <span asp-validation-for="MucTieuTietKiem" class="text-danger"></span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label asp-for="ThoiGianThang">Thời gian (tháng)</label>
+              <input asp-for="ThoiGianThang" class="form-control" type="number" min="1" max="60" />
+              <span asp-validation-for="ThoiGianThang" class="text-danger"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-calculator"></i> Lập kế hoạch
+          </button>
+        </div>
+      </form>
+
+      @if (Model?.ChiTietKeHoach != null && Model.ChiTietKeHoach.Any())
+      {
+        <div class="mt-4">
+          <div class="alert alert-info">
+            <h5>Kết quả tính toán:</h5>
+            <p>Số tiền cần gửi hàng tháng: @Model.SoTienGuiHangThang.ToString("N0") đ</p>
+            <p>Tổng tiền lãi dự kiến: @Model.TongTienLai.ToString("N0") đ</p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Tháng</th>
+                  <th>Tiền gửi</th>
+                  <th>Lãi tháng</th>
+                  <th>Tổng tích lũy</th>
+                  <th>% Mục tiêu</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var thang in Model.ChiTietKeHoach)
+                {
+                  <tr>
+                    <td>@thang.Thang</td>
+                    <td>@thang.SoTienGui.ToString("N0") đ</td>
+                    <td>@thang.TienLaiThang.ToString("N0") đ</td>
+                    <td>@thang.TongTichLuy.ToString("N0") đ</td>
+                    <td>@thang.TyLeDatMucTieu.ToString("N2")%</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+  <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.money-input').on('input', function () {
+        let value = $(this).val().replace(/\D/g, '');
+        $(this).val(new Intl.NumberFormat('vi-VN').format(value));
+      });
+
+      $('form').on('submit', function () {
+        $('.money-input').each(function () {
+          $(this).val($(this).val().replace(/\D/g, ''));
+        });
+      });
+    });
+  </script>
+}

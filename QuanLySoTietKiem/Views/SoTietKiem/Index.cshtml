@@ -1,0 +1,149 @@
+﻿@model IEnumerable<QuanLySoTietKiem.Models.SoTietKiemModel>
+@{
+    ViewData["Title"] = "Sổ Tiết Kiệm";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .fade-in-up {
+        opacity: 0;
+        animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .fade-in-up-delay {
+        animation-delay: calc(var(--delay) * 0.1s);
+    }
+</style>
+
+<div class="container mt-5">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show fade-in-up" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-lg border-0 rounded-3 fade-in-up" style="--delay: 1">
+        <div class="card-header bg-gradient bg-success text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-list-ul fa-2x me-3"></i>
+                    <h3 class="mb-0 fw-bold">Danh Sách Sổ Tiết Kiệm</h3>
+                </div>
+                <a asp-action="OpenSavingsAccount" class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Mở sổ tiết kiệm
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 fade-in-up" style="--delay: 2">
+                    <i class="bi bi-inbox display-1 text-muted mb-4"></i>
+                    <p class="lead fw-bold text-muted mb-4">Bạn chưa có sổ tiết kiệm nào</p>
+                    <a asp-action="OpenSavingsAccount" class="btn btn-success btn-lg">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Mở Sổ Tiết Kiệm Ngay
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr class="text-center">
+                                <th>Số Sổ</th>
+                                <th>Số Tiền Gửi</th>
+                                <th>Kỳ Hạn</th>
+                                @* <th>Code STK</th> *@
+                                <th>Lãi Suất</th>
+                                <th>Ngày Mở Sổ</th>
+                                <th>Ngày Đáo Hạn</th>
+                                <th>Trạng Thái</th>
+                                @* <th>Hình thức đến hạn</th> *@
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var delay = 2;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr class="text-center fade-in-up" style="--delay: @delay">
+                                    <td><span class="badge bg-primary">@item.MaSoTietKiem</span></td>
+                                    <td class="fw-bold text-success">@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
+                                    <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</td>
+                                    @* <td><span class="badge bg-secondary">@item.Code</span></td> *@
+                                    <td class="fw-bold">@item.LaiSuatApDung.ToString("P1")</td>
+                                    <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.TrangThai)
+                                        {
+                                            <span class="badge bg-success">Đang hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Đã đóng</span>
+                                        }
+                                    </td>
+                                    @* <td><span class="badge bg-success">@item.TenHinhThucDenHan</span></td> *@
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                                id="dropdownMenuButton@(item.MaSoTietKiem)" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="bi bi-gear"></i> Tùy chọn
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@(item.MaSoTietKiem)">
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="Details"
+                                                        asp-route-id="@item.MaSoTietKiem">
+                                                        <i class="bi bi-eye-fill me-2"></i>Xem chi tiết
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="WithdrawMoney"
+                                                        asp-route-id="@item.MaSoTietKiem">
+                                                        <i class="bi bi-cash-stack me-2"></i>Rút tiền
+                                                    </a>
+                                                </li>
+                                                @if (!item.TrangThai)
+                                                {
+                                                    <li>
+                                                        <form asp-action="DeleteSavingsAccount" asp-route-id="@item.MaSoTietKiem"
+                                                            method="post">
+                                                            <button type="submit" class="dropdown-item text-danger"
+                                                                onclick="return confirm('Bạn có chắc chắn muốn xóa sổ tiết kiệm này?')">
+                                                                <i class="bi bi-trash me-2"></i>Xóa sổ
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                delay++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach(el => {
+                el.style.opacity = '1';
+            });
+        });
+    </script>
+}

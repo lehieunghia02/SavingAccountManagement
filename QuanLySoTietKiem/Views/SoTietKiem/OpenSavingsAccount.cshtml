@@ -1,0 +1,241 @@
+@model QuanLySoTietKiem.Models.SoTietKiemModel
+@{
+  ViewData["Title"] = "Mở sổ tiết kiệm";
+  Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+  :root {
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --primary-light: rgba(13, 110, 253, 0.25);
+  }
+
+  .card {
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--primary-light);
+  }
+
+  .input-group-text {
+    border-radius: 8px 0 0 8px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+  }
+
+  .quick-amount {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+  }
+
+  .quick-amount:hover {
+    transform: translateY(-2px);
+  }
+
+  .quick-amount.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .alert {
+    border-radius: 8px;
+    animation: slideIn 0.5s ease-out;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg rounded-lg animate__animated animate__fadeIn">
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex align-items-center justify-content-center">
+            <i class="bi bi-piggy-bank-fill fa-2x me-2"></i>
+            <h3 class="mb-0 text-center">Mở Sổ Tiết Kiệm</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-primary shadow-sm">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <span class="fw-bold">Số dư hiện tại:</span>
+            <span class="fs-5 ms-2 text-primary">@ViewBag.SoDuHienTai.ToString("N0") VNĐ</span>
+          </div>
+
+          <form asp-action="OpenSavingsAccount" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-4">
+              <label asp-for="SoTienGui" class="form-label fw-bold text-primary">
+                <i class="bi bi-cash-stack me-2"></i> Số tiền gửi
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-currency-dollar"></i>
+                </span>
+                <input class="form-control" type="text" id="displayAmount"
+                  placeholder="Nhập số tiền muốn gửi (tối thiểu 1,000,000 VNĐ)" />
+                <input type="hidden" asp-for="SoTienGui" id="actualAmount" />
+              </div>
+              <div class="invalid-feedback">
+                Vui lòng nhập số tiền hợp lệ (tối thiểu 1,000,000 VNĐ)
+              </div>
+              <div class="mt-3 d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="1000000">
+                  1,000,000 VNĐ
+                </button>
+                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="5000000">
+                  5,000,000 VNĐ
+                </button>
+                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="10000000">
+                  10,000,000 VNĐ
+                </button>
+              </div>
+              <span asp-validation-for="SoTienGui" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+              <label asp-for="Code" class="form-label fw-bold text-primary">
+                <i class="bi bi-code-slash me-2"></i>Mã Sổ tiết kiệm (Tự)
+              </label>
+              <input asp-for="Code" class="form-control bg-light" type="text" value="@ViewBag.CodeSTK" readonly />
+              <small class="text-muted">Mã sổ được tạo tự động bởi hệ thống</small>
+            </div>
+
+            <div class="mb-4">
+              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-primary">
+                <i class="bi bi-calendar-event me-2"></i>Hình thức đến hạn
+              </label>
+              <select asp-for="MaHinhThucDenHan" class="form-select shadow-sm"
+                asp-items="ViewBag.HinhThucDenHanOptions">
+              </select>
+              <small class="text-muted">Chọn cách xử lý khi sổ đến hạn</small>
+              <span asp-validation-for="MaHinhThucDenHan" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+              <label asp-for="MaLoaiSo" class="form-label fw-bold text-primary">
+                <i class="bi bi-cash-stack me-2"></i>Loại sổ tiết kiệm
+              </label>
+              <select asp-for="MaLoaiSo" class="form-select shadow-sm">
+                @foreach (var item in (SelectList)ViewBag.LoaiSoTietKiemOptions)
+                {
+                  if (item.Text != "Không kỳ hạn")
+                  {
+                    <option value="@item.Value">@item.Text</option>
+                  }
+                }
+              </select>
+              <small class="text-muted">Chọn kỳ hạn và lãi suất tương ứng</small>
+              <span asp-validation-for="MaLoaiSo" class="text-danger"></span>
+            </div>
+
+            <div class="text-center mt-5">
+              <button type="submit" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-save me-2"></i>Mở Sổ Tiết Kiệm
+              </button>
+              <a asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">
+                <i class="bi bi-arrow-left me-2"></i>Quay Lại
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+
+  <script>
+    $(document).ready(function () {
+      const displayInput = $('#displayAmount');
+      const actualInput = $('#actualAmount');
+      const quickAmountButtons = $('.quick-amount');
+      const submitButton = $('button[type="submit"]');
+      const minAmount = 1000000;
+
+      // Hàm chuyển đổi chuỗi tiền thành số nguyên
+      function parseMoneyToInt(value) {
+        return parseInt(value.replace(/[^\d]/g, '')) || 0;
+      }
+
+      // Hàm kiểm tra số tiền hợp lệ
+      function validateAmount(amount) {
+        if (isNaN(amount) || amount < minAmount) {
+          displayInput.addClass('is-invalid');
+          submitButton.prop('disabled', true);
+          return false;
+        }
+        displayInput.removeClass('is-invalid');
+        submitButton.prop('disabled', false);
+        return true;
+      }
+
+      // Xử lý khi nhập số tiền
+      displayInput.on('input', function () {
+        // Xóa tất cả ký tự không phải số
+        let value = this.value.replace(/[^\d]/g, '');
+        // Chuyển thành số
+        let number = parseInt(value) || 0;
+
+        // Cập nhật giá trị thực (không có dấu phân cách) vào hidden input
+        actualInput.val(number);
+
+        // Format hiển thị với dấu phân cách
+        this.value = number.toLocaleString('vi-VN');
+
+        // Validate
+        validateAmount(number);
+      });
+
+      // Xử lý nút chọn nhanh
+      quickAmountButtons.click(function () {
+        const amount = parseInt($(this).data('amount'));
+        if (validateAmount(amount)) {
+          displayInput.val(amount.toLocaleString('vi-VN'));
+          actualInput.val(amount);
+          quickAmountButtons.removeClass('active');
+          $(this).addClass('active');
+        }
+      });
+
+      // Validate form trước khi submit
+      $('form').on('submit', function (e) {
+        const amount = parseInt(actualInput.val()) || 0;
+        if (!validateAmount(amount)) {
+          e.preventDefault();
+          displayInput.focus();
+          return false;
+        }
+        return true;
+      });
+
+      // Select2 cho các dropdown
+      $('#MaHinhThucDenHan, #MaLoaiSo').select2({
+        theme: 'bootstrap4',
+        width: '100%'
+      });
+    });
+  </script>
+}

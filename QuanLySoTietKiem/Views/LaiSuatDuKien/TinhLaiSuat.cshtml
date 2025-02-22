@@ -1,0 +1,101 @@
+@model QuanLySoTietKiem.Models.LaiSuatDuKien.LaiSuatDuKienModel
+@{
+    ViewData["Title"] = "Expected interest rate";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-calculator me-2"></i>
+                        Expected interest rate
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="TinhLaiSuat" method="post" class="needs-validation">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="SoTienGui" class="form-label">Deposit amount</label>
+                            <div class="input-group">
+                                <input asp-for="SoTienGui" class="form-control money-input" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="SoTienGui" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="KyHan" class="form-label">Term</label>
+                            <select asp-for="KyHan" asp-items="ViewBag.KyHanOptions" class="form-select">
+                                <option value="">-- Select term --</option>
+                            </select>
+                            <span asp-validation-for="KyHan" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-calculator-fill me-2"></i>Calculate
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (Model.TienLaiDuKien > 0)
+                    {
+                        <div class="mt-4">
+                            <div class="alert alert-success">
+                                <h4 class="alert-heading mb-3">Calculation result</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered mb-0">
+                                        <tr>
+                                            <td class="fw-bold">Deposit amount:</td>
+                                            <td class="text-end">@Model.SoTienGui.ToString("N0") VNĐ</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Term:</td>
+                                            <td class="text-end">@Model.KyHan tháng</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Applied interest rate:</td>
+                                            <td class="text-end">@Model.LaiSuatDuKien.ToString("N2")%/year</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Expected interest:</td>
+                                            <td class="text-end text-success">@Model.TienLaiDuKien.ToString("N0") VNĐ</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td class="fw-bold">Total amount received:</td>
+                                            <td class="text-end fw-bold">@Model.TongTienDuKien.ToString("N0") VNĐ</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Format input tiền tệ
+        $(document).ready(function () {
+            $('.money-input').on('input', function () {
+                let value = $(this).val().replace(/\D/g, '');
+                $(this).val(new Intl.NumberFormat('vi-VN').format(value));
+            });
+
+            $('form').on('submit', function () {
+                $('.money-input').each(function () {
+                    $(this).val($(this).val().replace(/\D/g, ''));
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,168 @@
+@{
+  ViewData["Title"] = "Dashboard";
+  Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Trang quản lý hệ thống</h1>
+
+  <div class="row">
+    @* <!-- Dashboard Cards -->
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Users</h5>
+          <p class="card-text">Manage system users</p>
+          <a href="#" class="btn btn-primary">View Users</a>
+        </div>
+      </div>
+    </div> *@
+
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Báo cáo</h5>
+          <p class="card-text">Xem báo cáo hệ thống</p>
+          <a asp-controller="Admin" asp-action="ReportByDay" class="btn btn-primary">Xem báo cáo</a>
+        </div>
+      </div>
+    </div>
+    <!-- Add Chart Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Thống kê tiền gửi và tiền rút</h5>
+            <canvas id="transactionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var ctx = document.getElementById('transactionChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+          datasets: [{
+            label: 'Tiền gửi',
+            data: @Json.Serialize(ViewBag.MonthlyDeposits),
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgb(75, 192, 192)',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6,
+            pointHoverBorderWidth: 3
+          },
+          {
+            label: 'Tiền rút',
+            data: @Json.Serialize(ViewBag.MonthlyWithdrawals),
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgb(255, 99, 132)',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6,
+            pointHoverBorderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Biểu đồ thống kê tiền gửi và tiền rút theo tháng',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            legend: {
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              titleColor: '#000',
+              titleFont: {
+                size: 13
+              },
+              bodyColor: '#000',
+              bodyFont: {
+                size: 13
+              },
+              borderColor: '#ddd',
+              borderWidth: 1,
+              padding: 10,
+              callbacks: {
+                label: function (context) {
+                  return context.dataset.label + ': ' +
+                    context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Số tiền (VNĐ)',
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                padding: 10,
+                callback: function (value) {
+                  return value.toLocaleString('vi-VN') + ' VNĐ';
+                }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Tháng',
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                padding: 10
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+}

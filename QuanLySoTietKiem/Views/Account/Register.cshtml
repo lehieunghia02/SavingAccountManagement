@@ -1,0 +1,259 @@
+﻿@model QuanLySoTietKiem.Models.AccountModels.RegisterrModel.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@* <style>
+    .form-select {
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style> *@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-plus-fill fa-2x me-2"></i>
+                        <h3 class="mb-0">Register</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="UserName" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-person-badge me-2"></i>Username
+                                    </label>
+                                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-envelope-fill me-2"></i>Email
+                                    </label>
+                                    <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-person-fill me-2"></i>Full name
+                                    </label>
+                                    <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Address" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-geo-alt-fill me-2"></i>Address
+                                    </label>
+                                    <input asp-for="Address" class="form-control" placeholder="Enter address" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                                @* <div class="mb-3">
+                                    <label class="form-label fw-bold text-primary">
+                                        <i class="bi bi-geo-alt-fill me-2"></i>Địa chỉ
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <select id="province" class="form-select">
+                                                <option value="">Chọn tỉnh/thành</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <select id="district" class="form-select">
+                                                <option value="">Chọn quận/huyện</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <select id="ward" class="form-select">
+                                                <option value="">Chọn phường/xã</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <input asp-for="Address" type="hidden" id="fullAddress" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div> *@
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CCCD" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-credit-card-2-front-fill me-2"></i>Số CMND
+                                    </label>
+                                    <input asp-for="CCCD" class="form-control" placeholder="Nhập số CMND" />
+                                    <span asp-validation-for="CCCD" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-telephone-fill me-2"></i>Phone number
+                                    </label>
+                                    <input asp-for="PhoneNumber" class="form-control"
+                                        placeholder="Enter phone number" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Password" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-lock-fill me-2"></i>Password
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="Password" class="form-control" type="password"
+                                            placeholder="Enter password" id="passwordInput" />
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="togglePasswordVisibility()">
+                                            <i class="bi bi-eye-fill" id="togglePasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                                <script>
+                                    function togglePasswordVisibility() {
+                                        var passwordInput = document.getElementById('passwordInput');
+                                        var togglePasswordIcon = document.getElementById('togglePasswordIcon');
+                                        if (passwordInput.type === 'password') {
+                                            passwordInput.type = 'text';
+                                            togglePasswordIcon.classList.remove('bi-eye-fill');
+                                            togglePasswordIcon.classList.add('bi-eye-slash-fill');
+                                        } else {
+                                            passwordInput.type = 'password';
+                                            togglePasswordIcon.classList.remove('bi-eye-slash-fill');
+                                            togglePasswordIcon.classList.add('bi-eye-fill');
+                                        }
+                                    }
+                                </script>
+
+                                <div class="mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label fw-bold text-primary">
+                                        <i class="bi bi-shield-lock-fill me-2"></i>Nhập lại mật khẩu
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="ConfirmPassword" class="form-control" type="password"
+                                            placeholder="Nhập lại mật khẩu" id="confirmPasswordInput" />
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="toggleConfirmPasswordVisibility()">
+                                            <i class="bi bi-eye-fill" id="toggleConfirmPasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="ConfirmPassword" class="te    xt-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-person-plus-fill me-2"></i>Register
+                            </button>
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary ms-2">
+                                <i class="bi bi-arrow-left me-2"></i>Back to login page
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @* <script>
+        const API_URL = 'https://provinces.open-api.vn/api';
+
+        async function loadProvinces() {
+            try {
+                const response = await fetch(`${API_URL}/p`);
+                const provinces = await response.json();
+                const provinceSelect = document.getElementById('province');
+                provinces.forEach(province => {
+                    const option = new Option(province.name, province.code);
+                    provinceSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải tỉnh/thành:', error);
+            }
+        }
+
+        async function loadDistricts(provinceCode) {
+            try {
+                const response = await fetch(`${API_URL}/p/${provinceCode}?depth=2`);
+                const data = await response.json();
+                const districtSelect = document.getElementById('district');
+
+                // Xóa các option cũ
+                districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+                document.getElementById('ward').innerHTML = '<option value="">Chọn phường/xã</option>';
+
+                data.districts.forEach(district => {
+                    const option = new Option(district.name, district.code);
+                    districtSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải quận/huyện:', error);
+            }
+        }
+
+        async function loadWards(districtCode) {
+            try {
+                const response = await fetch(`${API_URL}/d/${districtCode}?depth=2`);
+                const data = await response.json();
+                const wardSelect = document.getElementById('ward');
+
+                // Xóa các option cũ
+                wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+
+                data.wards.forEach(ward => {
+                    const option = new Option(ward.name, ward.code);
+                    wardSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải phường/xã:', error);
+            }
+        }
+
+        function updateFullAddress() {
+            const province = document.getElementById('province');
+            const district = document.getElementById('district');
+            const ward = document.getElementById('ward');
+
+            if (province.selectedIndex > 0 && district.selectedIndex > 0 && ward.selectedIndex > 0) {
+                const fullAddress = `${ward.options[ward.selectedIndex].text}, ${district.options[district.selectedIndex].text}, ${province.options[province.selectedIndex].text}`;
+                document.getElementById('fullAddress').value = fullAddress;
+            }
+        }
+
+        // Khởi tạo sự kiện
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProvinces();
+
+            document.getElementById('province').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadDistricts(e.target.value);
+                }
+                updateFullAddress();
+            });
+
+            document.getElementById('district').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadWards(e.target.value);
+                }
+                updateFullAddress();
+            });
+
+            document.getElementById('ward').addEventListener('change', () => {
+                updateFullAddress();
+            });
+        });
+    </script> *@
+}

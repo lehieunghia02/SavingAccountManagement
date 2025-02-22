@@ -1,0 +1,137 @@
+@{
+  ViewData["Title"] = "Quy định và điều khoản";
+  Layout = "~/Views/Shared/_UserLayout.cshtml";
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="text-center mb-4">@ViewBag.QuyDinh</h1>
+
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">1. Điều kiện mở tài khoản tiết kiệm trực tuyến</h3>
+            <div class="card bg-light">
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Khách hàng phải có tài khoản thanh toán tại
+                    UIT Banking.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Khách hàng đăng ký dịch vụ ngân hàng trực
+                    tuyến của UIT Banking.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Số tiền gửi tối thiểu: <strong>1.000.000
+                      VND</strong></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Similar pattern for other sections -->
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">2. Các kỳ hạn và lãi suất</h3>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Kỳ hạn</th>
+                    <th>Lãi suất</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>3 tháng</td>
+                    <td>5.0%/năm</td>
+                  </tr>
+                  <tr>
+                    <td>6 tháng</td>
+                    <td>5.5%/năm</td>
+                  </tr>
+                  <tr>
+                    <td>12 tháng</td>
+                    <td>6.0%/năm</td>
+                  </tr>
+                  <tr>
+                    <td>Không kỳ hạn</td>
+                    <td>0.5%/năm</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="text-danger text-bold accept-policy">Lưu ý: Lãi suất không kỳ hạn chỉ áp dụng cho số tiền rút
+                trước kỳ hạn</p>
+            </div>
+          </div>
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">3. Phương thức đáo hạn</h3>
+            <div class="card bg-light">
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Rút hết tiền: Cả gốc và lãi được chuyển về
+                    tài khoản thanh toán.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Quay vòng với gốc, lãi nhập vào tài khoản
+                    thanh toán: Gốc được tiếp tục gửi kỳ hạn mới, lãi chuyển vào tài khoản thanh toán.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Quay vòng cả gốc và lãi: Toàn bộ gốc và lãi
+                    được tự động tái tục với kỳ hạn tương tự kỳ hạn ban đầu.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Continue similar pattern for other sections -->
+
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">4. Quy định về nạp thêm tiền</h3>
+            <div class="card bg-light">
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li><i class="fas fa-check-circle text-success me-2"></i>UIT Banking không hỗ trợ nạp thêm tiền vào
+                    tài khoản tiết kiệm đang gửi.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Nếu khách hàng muốn tăng thêm số tiền tiết
+                    kiệm, cần đợi đến ngày đáo hạn để tất toán tài khoản hiện tại và mở sổ tiết kiệm mới.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">5. Quy định về rút tiền</h3>
+            <div class="card bg-light">
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Khách hàng được phép rút một phần số tiền
+                    tiết
+                    kiệm trước ngày đáo hạn. Số tiền rút trước hạn sẽ áp dụng lãi suất không kỳ hạn 0.5%/năm cho khoảng
+                    thời gian gửi thực tế.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i>Số dư còn lại sau khi rút trước hạn tiếp tục
+                    được hưởng lãi suất ban đầu theo kỳ hạn đã cam kết.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="terms-section mb-4">
+            <h3 class="text-primary">7. Quy định về quyền và trách nhiệm của khách hàng</h3>
+            <div class="card bg-light">
+              <div class="card-body">
+                <ul class="list-unstyled">
+                  <li><i class="fas fa-check-circle text-success me-2"></i><strong>Quyền:</strong>
+
+                    - Lựa chọn kỳ hạn gửi, phương thức đáo hạn phù hợp.
+                    - Theo dõi thông tin tài khoản tiết kiệm trực tuyến mọi lúc, mọi nơi.
+                    - Rút tiền hoặc tất toán theo quy định.</li>
+                  <li><i class="fas fa-check-circle text-success me-2"></i><strong>Trách nhiệm:</strong>
+
+                    - Đảm bảo tuân thủ các điều khoản gửi tiết kiệm do UIT ban hành.
+                    - Chịu trách nhiệm bảo mật thông tin đăng nhập và giao dịch trực tuyến.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

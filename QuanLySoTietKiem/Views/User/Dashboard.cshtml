@@ -1,0 +1,308 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="container mt-5">
+    @* Show gun *@
+
+
+    <div class="text-center mb-4">
+        <h3 class="text-danger fw-bold animate__animated animate__fadeIn">
+            <i class="bi bi-piggy-bank me-2"></i>
+            Easy savings – A secure future
+            <i class="bi bi-stars ms-2"></i>
+        </h3>
+        <p class="text-muted fst-italic">Start your dreams</p>
+    </div>
+    <div class="text-center text-green-500 alert alert-success">@ViewBag.ThongBao
+        <p>Hello @User.Identity.Name has logged in the system 😊😊😊</p>
+        <p class="text-center ">Now is <span id="current-time">@DateTime.Now</span></p>
+        <script>
+            setInterval(function () {
+                document.getElementById('current-time').innerText = new Date().toLocaleTimeString();
+            }, 1000);
+        </script>
+    </div>
+
+
+    <div class="row mt-3">
+        @* <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">
+                        Tài khoản tiết kiệm
+                    </h5>
+                    <p class="card-text">Xem và quản lý tài khoản tiết kiệm của bạn.</p>
+                    <a href="/SoTietKiem/OpenSavingsAccount" class="btn btn-primary">Mở tài khoản tiết kiệm</a>
+                </div>
+            </div>
+        </div> *@
+        @* <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-circle fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">
+                        Thông tin cá nhân
+                    </h5>
+                    <p class="card-text">Xem và chỉnh sửa thông tin cá nhân của bạn.</p>
+                    <a href="/User/Profile" class="btn btn-primary">Xem thông tin</a>
+                </div>
+            </div>
+        </div> *@
+
+    </div>
+
+    <div class="row">
+        <!-- Biểu đồ Polar Area -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Total savings account</h5>
+                    <canvas id="polarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ Doughnut -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Distribution of savings types</h5>
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ theo tháng -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Statistics of opening/closing accounts by month</h5>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ theo ngày -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Statistics of opening/closing accounts by day</h5>
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Biểu đồ Polar Area
+        const polarCtx = document.getElementById('polarChart').getContext('2d');
+        new Chart(polarCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Đang hoạt động', 'Đã đóng'],
+                datasets: [{
+                    data: [@ViewBag.ActiveAccounts, @ViewBag.ClosedAccounts],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 99, 132)'
+                    ],
+                    borderWidth: 1,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Savings account ratio',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: 20
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                let percentage = ((value * 100) / total).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+
+        // Biểu đồ Doughnut
+        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Json.Serialize(ViewBag.SavingTypes),
+                datasets: [{
+                    data: @Json.Serialize(ViewBag.SavingTypeCounts),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 206, 86)',
+                    ],
+                    borderWidth: 1,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of accounts by type',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: 20
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                let percentage = ((value * 100) / total).toFixed(1);
+                                @* let amount = @Json.Serialize(ViewBag.SavingTypeAmounts)[context.dataIndex]; *@
+                                                                                                                                    return [
+                                    `${label}: ${value} sổ (${percentage}%)`,
+                                    `Tổng tiền: ${amount.toLocaleString('vi-VN')} VNĐ`
+                                ];
+                            }
+                        }
+                    }
+                },
+                cutout: '70%',
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+
+        // Biểu đồ theo tháng
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                datasets: [
+                    {
+                        label: 'Mở sổ',
+                        data: @Json.Serialize(ViewBag.MonthlyOpenData),
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Đóng sổ',
+                        data: @Json.Serialize(ViewBag.MonthlyCloseData),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Thống kê năm ' + new Date().getFullYear()
+                    }
+                }
+            }
+        });
+
+        // Biểu đồ theo ngày
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: @ViewBag.DaysInMonth}, (_, i) => i + 1),
+                datasets: [
+                    {
+                        label: 'Mở sổ',
+                        data: @Json.Serialize(ViewBag.DailyOpenData),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: false
+                    },
+                    {
+                        label: 'Đóng sổ',
+                        data: @Json.Serialize(ViewBag.DailyCloseData),
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Thống kê tháng ' + (new Date().getMonth() + 1)
+                    }
+                }
+            }
+        });
+    </script>
+}
