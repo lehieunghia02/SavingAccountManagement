@@ -35,3 +35,9 @@ Hệ thống quản lý sổ tiết kiệm online giúp người dùng dễ dàn
 - Identity Framework
 - Bootstrap
 - jQuery
+
+
+## Cài đặt 
+```
+git clone https://github.com/your-username/QuanLySoTietKiem.git
+```
