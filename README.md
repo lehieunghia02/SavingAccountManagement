@@ -1,6 +1,6 @@
 # Saving Money Management System
 A system for managing savings accounts online to help users easily track and manage their savings.
-## Main features
+## Features
 
 ### 1. Account management
 - Register, login
@@ -59,7 +59,7 @@ SavingMoneyManagement/
 
 1. Clone the repository:
 ```
-git clone https://github.com/your-username/SavingMoneyManagement.git
+git clone https://github.com/lehieungia02/SavingMoneyManagement.git
 ```
 2. Update the database connection string in this file `appsettings.json`
 3. Run migrations to create the database: 
@@ -71,7 +71,7 @@ dotnet ef database update
 dotnet build
 dotnet run
 ```
-5. Open the browser and navigate to `https://localhost:7272`
+5. Open the browser and navigate to `https://localhost:7902`
 
 ### Account demo 
 - Admin: `admin@gmail.com` ; Password: `Admin@123`
