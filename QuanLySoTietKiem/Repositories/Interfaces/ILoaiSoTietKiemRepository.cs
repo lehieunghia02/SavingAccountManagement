@@ -1,3 +1,4 @@
+using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
 
 namespace QuanLySoTietKiem.Repositories.Interfaces

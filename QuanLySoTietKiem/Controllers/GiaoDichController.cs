@@ -6,6 +6,8 @@ using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using QuanLySoTietKiem.Constaints;
+using QuanLySoTietKiem.Entity;
 
 namespace QuanLySoTietKiem.Controllers;
 
@@ -24,7 +26,7 @@ public class GiaoDichController : Controller
         _logger = logger;
     }
     [HttpGet]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = RoleConstants.User)]
     public async Task<IActionResult> Index()
     {
         var currentUser = await _userManager.GetUserAsync(User);
@@ -48,7 +50,7 @@ public class GiaoDichController : Controller
 
 
     [HttpPost]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = RoleConstants.User)]
     public async Task<IActionResult> Index(int selectedAccountId)
     {
         var transactions = await _context.GiaoDichs
@@ -71,5 +73,4 @@ public class GiaoDichController : Controller
         ViewBag.SavingsAccounts = new SelectList(savingsAccounts, "MaSoTietKiem", "Code");
         return View();
     }
-
 }

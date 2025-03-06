@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
 using QuanLySoTietKiem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using QuanLySoTietKiem.Constaints;
 using QuanLySoTietKiem.Data;
+using QuanLySoTietKiem.Entity;
+using QuanLySoTietKiem.Models.AccountModels.EditProfileModel;
 
 namespace QuanLySoTietKiem.Controllers
 {
+    [Authorize(Policy = PolicyConstants.RequireUser)]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
@@ -16,7 +19,10 @@ namespace QuanLySoTietKiem.Controllers
         private readonly ISoTietKiemService _soTietKiemService;
         private readonly ApplicationDbContext _context;
 
-        public UserController(ILogger<UserController> logger, UserManager<ApplicationUser> userManager, ISoTietKiemService soTietKiemService, ApplicationDbContext context)
+        public UserController(ILogger<UserController> logger,
+            UserManager<ApplicationUser> userManager,
+            ISoTietKiemService soTietKiemService,
+            ApplicationDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
@@ -36,8 +42,9 @@ namespace QuanLySoTietKiem.Controllers
             }
             return RedirectToAction("Dashboard", "User");
         }
+        //Trang thống kê của user
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = RoleConstants.User)]
         public async Task<IActionResult> Dashboard()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -59,6 +66,8 @@ namespace QuanLySoTietKiem.Controllers
             ViewBag.SavingTypeCounts = savingTypeStats.Select(s => s.Count).ToList();
             ViewBag.SavingTypeAmounts = savingTypeStats.Select(s => s.Amount).ToList();
 
+            // Thêm thông báo
+            ViewBag.ThongBao = "Chào mừng bạn Quay trở lại hệ thống";
             // Thêm thống kê tổng quan cho Polar Area Chart
             var totalStats = await _context.SoTietKiems
                 .Where(s => s.UserId == currentUser.Id)
@@ -117,12 +126,12 @@ namespace QuanLySoTietKiem.Controllers
             ViewBag.DailyOpenData = dailyOpenData;
             ViewBag.DailyCloseData = dailyCloseData;
             ViewBag.DaysInMonth = daysInMonth;
-
+            ViewBag.CountSoTietKiemInMonth = await _soTietKiemService.GetCountSoTietKiemInMonth(currentUser.Id);
             return View();
         }
 
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = RoleConstants.User)]
         public async Task<IActionResult> Profile()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -133,7 +142,7 @@ namespace QuanLySoTietKiem.Controllers
             return View(currentUser);
         }
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = RoleConstants.User)]
         public async Task<IActionResult> EditProfile()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -145,10 +154,16 @@ namespace QuanLySoTietKiem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProfile(ApplicationUser model)
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileModel model)
         {
-            _logger.LogInformation("EditProfile action called");
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
             {
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
@@ -159,17 +174,25 @@ namespace QuanLySoTietKiem.Controllers
                 user.FullName = model.FullName;
                 user.Address = model.Address;
                 user.PhoneNumber = model.PhoneNumber;
+
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Profile");
+                    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                    return RedirectToAction(nameof(Profile));
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError("", error.Description);
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi cập nhật thông tin người dùng");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật thông tin!";
+            }
+
             return View(model);
         }
         [HttpGet]

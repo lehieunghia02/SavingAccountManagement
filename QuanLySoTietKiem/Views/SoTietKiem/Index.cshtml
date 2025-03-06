@@ -1,34 +1,25 @@
 ﻿@model IEnumerable<QuanLySoTietKiem.Models.SoTietKiemModel>
 @{
-    ViewData["Title"] = "Sổ Tiết Kiệm";
+    ViewData["Title"] = "Danh sách sổ tiết kiệm";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
-<style>
-    .fade-in-up {
-        opacity: 0;
-        animation: fadeInUp 0.4s ease forwards;
-    }
+<link rel="stylesheet" href="/css/user/sotietkiem.css">
 
-    .fade-in-up-delay {
-        animation-delay: calc(var(--delay) * 0.1s);
-    }
-</style>
-
-<div class="container mt-5">
+<div class="container mt-4 mt-md-5">
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show fade-in-up" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             @TempData["Message"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="card shadow-lg border-0 rounded-3 fade-in-up" style="--delay: 1">
-        <div class="card-header bg-gradient bg-success text-white py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-gradient text-white py-3 py-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
                     <i class="bi bi-list-ul fa-2x me-3"></i>
                     <h3 class="mb-0 fw-bold">Danh Sách Sổ Tiết Kiệm</h3>
                 </div>
@@ -37,10 +28,10 @@
                 </a>
             </div>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
             @if (!Model.Any())
             {
-                <div class="text-center py-5 fade-in-up" style="--delay: 2">
+                <div class="empty-state">
                     <i class="bi bi-inbox display-1 text-muted mb-4"></i>
                     <p class="lead fw-bold text-muted mb-4">Bạn chưa có sổ tiết kiệm nào</p>
                     <a asp-action="OpenSavingsAccount" class="btn btn-success btn-lg">
@@ -51,73 +42,68 @@
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                    <table class="table">
+                        <thead>
                             <tr class="text-center">
                                 <th>Số Sổ</th>
                                 <th>Số Tiền Gửi</th>
-                                <th>Kỳ Hạn</th>
-                                @* <th>Code STK</th> *@
-                                <th>Lãi Suất</th>
-                                <th>Ngày Mở Sổ</th>
-                                <th>Ngày Đáo Hạn</th>
+                                <th class="d-none d-md-table-cell">Kỳ Hạn</th>
+                                <th class="d-none d-md-table-cell">Lãi Suất</th>
+                                <th class="d-none d-lg-table-cell">Ngày Mở Sổ</th>
+                                <th class="d-none d-lg-table-cell">Ngày Đáo Hạn</th>
                                 <th>Trạng Thái</th>
-                                @* <th>Hình thức đến hạn</th> *@
                                 <th>Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var delay = 2;
-                            }
                             @foreach (var item in Model)
                             {
-                                <tr class="text-center fade-in-up" style="--delay: @delay">
+                                var isActive = item.TrangThai;
+                                <tr class="text-center @(isActive ? "active-account" : "")">
                                     <td><span class="badge bg-primary">@item.MaSoTietKiem</span></td>
-                                    <td class="fw-bold text-success">@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
-                                    <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</td>
-                                    @* <td><span class="badge bg-secondary">@item.Code</span></td> *@
-                                    <td class="fw-bold">@item.LaiSuatApDung.ToString("P1")</td>
-                                    <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
+                                    <td><span class="money-amount">@item.SoDuSoTietKiem.ToString("N0") VNĐ</span></td>
+                                    <td class="d-none d-md-table-cell">@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</td>
+                                    <td class="d-none d-md-table-cell"><span class="interest-rate">@item.LaiSuatApDung.ToString("P1")</span></td>
+                                    <td class="d-none d-lg-table-cell">@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
+                                    <td class="d-none d-lg-table-cell">@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
                                     <td>
                                         @if (item.TrangThai)
                                         {
-                                            <span class="badge bg-success">Đang hoạt động</span>
+                                            <span class="badge bg-success">Hoạt động</span>
                                         }
                                         else
                                         {
                                             <span class="badge bg-danger">Đã đóng</span>
                                         }
                                     </td>
-                                    @* <td><span class="badge bg-success">@item.TenHinhThucDenHan</span></td> *@
-                                    <td>
+                                    <td class="action-column">
                                         <div class="dropdown">
                                             <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
-                                                id="dropdownMenuButton@(item.MaSoTietKiem)" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                <i class="bi bi-gear"></i> Tùy chọn
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Tùy chọn</span>
                                             </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@(item.MaSoTietKiem)">
+                                            <ul class="dropdown-menu dropdown-menu-end">
                                                 <li>
                                                     <a class="dropdown-item" asp-action="Details"
                                                         asp-route-id="@item.MaSoTietKiem">
                                                         <i class="bi bi-eye-fill me-2"></i>Xem chi tiết
                                                     </a>
                                                 </li>
-                                                <li>
-                                                    <a class="dropdown-item" asp-action="WithdrawMoney"
-                                                        asp-route-id="@item.MaSoTietKiem">
-                                                        <i class="bi bi-cash-stack me-2"></i>Rút tiền
-                                                    </a>
-                                                </li>
+                                                @if (item.TrangThai)
+                                                {
+                                                    <li>
+                                                        <a class="dropdown-item" asp-action="WithdrawMoney"
+                                                            asp-route-id="@item.MaSoTietKiem">
+                                                            <i class="bi bi-cash-stack me-2"></i>Rút tiền
+                                                        </a>
+                                                    </li>
+                                                }
                                                 @if (!item.TrangThai)
                                                 {
                                                     <li>
                                                         <form asp-action="DeleteSavingsAccount" asp-route-id="@item.MaSoTietKiem"
-                                                            method="post">
-                                                            <button type="submit" class="dropdown-item text-danger"
-                                                                onclick="return confirm('Bạn có chắc chắn muốn xóa sổ tiết kiệm này?')">
+                                                            method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sổ tiết kiệm này?')">
+                                                            <button type="submit" class="dropdown-item text-danger">
                                                                 <i class="bi bi-trash me-2"></i>Xóa sổ
                                                             </button>
                                                         </form>
@@ -127,7 +113,34 @@
                                         </div>
                                     </td>
                                 </tr>
-                                delay++;
+                                
+                                <!-- Mobile Expandable Row -->
+                                <tr class="d-md-none mobile-details">
+                                    <td colspan="4" class="p-0">
+                                        <div class="collapse" id="mobileDetails@(item.MaSoTietKiem)">
+                                            <div class="card card-body border-0 mb-3">
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <p class="mb-1 text-muted">Kỳ Hạn:</p>
+                                                        <p class="fw-bold">@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</p>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mb-1 text-muted">Lãi Suất:</p>
+                                                        <p class="fw-bold text-warning">@item.LaiSuatApDung.ToString("P1")</p>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mb-1 text-muted">Ngày Mở Sổ:</p>
+                                                        <p class="fw-bold">@item.NgayMoSo.ToString("dd/MM/yyyy")</p>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mb-1 text-muted">Ngày Đáo Hạn:</p>
+                                                        <p class="fw-bold">@item.NgayDaoHan.ToString("dd/MM/yyyy")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -140,10 +153,313 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const elements = document.querySelectorAll('.fade-in-up');
-            elements.forEach(el => {
-                el.style.opacity = '1';
+            // Xử lý mobile expandable rows
+            document.querySelectorAll('.badge.bg-primary').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    const accountId = this.textContent;
+                    const detailsElement = document.getElementById('mobileDetails' + accountId);
+                    if (detailsElement) {
+                        $(detailsElement).collapse('toggle');
+                    }
+                });
             });
         });
     </script>
+}
+
+@section Styles {
+    <style>
+    /* Card styling */
+    .card-header.bg-gradient {
+        background: linear-gradient(45deg, #00796b, #009688);
+        border-bottom: none;
+        box-shadow: 0 4px 20px rgba(0, 121, 107, 0.2);
+    }
+
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    /* Table styling */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .table tbody tr {
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background-color: #f8f9ff;
+    }
+        
+        /* Không áp dụng hover cho hàng chi tiết mobile */
+        .table tbody tr.mobile-details:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: transparent;
+        }
+
+    .table th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        border: none;
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    /* Status badges */
+    .badge {
+        padding: 8px 12px;
+        font-weight: 500;
+        border-radius: 30px;
+    }
+
+    .badge.bg-primary {
+        background: linear-gradient(45deg, #1976d2, #2196f3) !important;
+        box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(45deg, #2e7d32, #4caf50) !important;
+        box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+    }
+
+    .badge.bg-danger {
+        background: linear-gradient(45deg, #c62828, #f44336) !important;
+        box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+    }
+
+    /* Button styling */
+    .btn-success {
+        background: linear-gradient(45deg, #00796b, #009688);
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(45deg, #00695c, #00897b);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 121, 107, 0.3);
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #1565c0, #1976d2);
+        border: none;
+        box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0d47a1, #1565c0);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(25, 118, 210, 0.3);
+    }
+
+    /* Empty state styling */
+    .empty-state {
+        padding: 60px 0;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 80px;
+        color: #b0bec5;
+        margin-bottom: 20px;
+    }
+
+    .empty-state p {
+        color: #78909c;
+        font-size: 20px;
+        margin-bottom: 30px;
+    }
+
+    /* Money amount styling */
+    .money-amount {
+        font-weight: 700;
+        color: #00695c;
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Dropdown menu fix */
+    .dropdown {
+            position: relative;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        z-index: 9999 !important;
+        border: none;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 10px;
+        min-width: 200px;
+            right: 0;
+            left: auto;
+    }
+
+    .dropdown-item {
+        border-radius: 5px;
+        padding: 8px 15px;
+        transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f1f8e9;
+        transform: translateX(5px);
+    }
+
+    .dropdown-item.text-danger:hover {
+        background-color: #ffebee;
+    }
+
+    /* Interest rate highlight */
+    .interest-rate {
+        position: relative;
+        font-weight: 700;
+        color: #ff6f00;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background-color: #fff8e1;
+        display: inline-block;
+    }
+
+    /* Shimmer effect for active accounts */
+    .active-account {
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* Đảm bảo dropdown hiển thị đúng */
+    .table-responsive {
+        overflow: visible !important;
+    }
+
+    .table {
+        position: relative;
+    }
+
+    .action-column {
+        position: relative;
+    }
+        
+        /* Mobile expandable row styling */
+        .mobile-details .card {
+            border-radius: 10px;
+            margin-top: -8px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .mobile-details .text-muted {
+            font-size: 0.8rem;
+        }
+        
+        .mobile-details .fw-bold {
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive styles */
+        @@media (max-width: 767.98px) {
+            .card-header h3 {
+                font-size: 1.5rem;
+            }
+            
+            .btn-lg {
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+            }
+            
+            .table th, .table td {
+                padding: 0.75rem;
+            }
+            
+            .money-amount {
+                font-size: 0.9rem;
+            }
+            
+            .badge {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .dropdown-toggle {
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .badge.bg-primary {
+                cursor: pointer;
+            }
+            
+            .mobile-details .card-body {
+                padding: 0.75rem;
+            }
+        }
+        
+        @@media (max-width: 575.98px) {
+            .card-header {
+                padding: 0.75rem;
+            }
+            
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+            
+            .card-header .bi-list-ul {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+            
+            .money-amount {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Dark mode support */
+        @@media (prefers-color-scheme: dark) {
+            .table tbody tr {
+                background-color: #2d3748;
+            }
+            
+            .table tbody tr:hover {
+                background-color: #3a4a5e;
+            }
+            
+            .money-amount {
+                color: #4fd1c5;
+            }
+            
+            .mobile-details .card {
+                background-color: #2d3748;
+            }
+            
+            .interest-rate {
+                background-color: #4a5568;
+                color: #fbd38d;
+            }
+        }
+    </style>
 }

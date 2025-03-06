@@ -5,49 +5,68 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using QuanLySoTietKiem.Constaints;
 using QuanLySoTietKiem.Data;
+using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
+using QuanLySoTietKiem.Models.RoleViewModels;
 
 namespace QuanLySoTietKiem.Controllers
 {
+    [Authorize(Roles = RoleConstants.Admin)]
     public class AdminController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<AdminController> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         [ActivatorUtilitiesConstructor]
-        public AdminController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, ILogger<AdminController> logger)
+        public AdminController(
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context,
+            ILogger<AdminController> logger,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _context = context;
             _logger = logger;
+            _roleManager = roleManager;
         }
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("");
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return RedirectToAction("Dashboard", "Admin");
+                return RedirectToAction("Login", "Account");
             }
-            return View();
+
+            var roles = await _userManager.GetRolesAsync(currentUser);
+            if (!roles.Contains(RoleConstants.Admin))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (roles.Contains(RoleConstants.User))
+            {
+                return RedirectToAction("Index", "User");
+            }
+
+            return RedirectToAction("Dashboard", "Admin");
+
         }
+
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Dashboard()
         {
             var (deposits, withdrawals) = await GetTransactionDataByMonth();
-            Console.WriteLine("deposits: ");
-            Console.WriteLine(deposits);
-            Console.WriteLine("withdrawals: ");
-            Console.WriteLine(withdrawals);
             ViewBag.MonthlyDeposits = deposits;
             ViewBag.MonthlyWithdrawals = withdrawals;
             return View();
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Report()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -60,14 +79,21 @@ namespace QuanLySoTietKiem.Controllers
         }
         // User Management  
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
+        public async Task<IActionResult> UserManagement()
+        {
+            // Redirect to UserList action
+            return RedirectToAction(nameof(UserList));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleConstants.Admin)]
         public async Task<IActionResult> UserList()
         {
             var users = await _userManager.GetUsersInRoleAsync("User");
             return View(users);
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
@@ -82,7 +108,7 @@ namespace QuanLySoTietKiem.Controllers
             return View(user);
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         public async Task<IActionResult> ReportByDay()
         {
             // Get today's date at midnight
@@ -93,7 +119,6 @@ namespace QuanLySoTietKiem.Controllers
             return View(report);
         }
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ReportByDay(DateTime date)
         {
             var report = await GenerateDailyReport(date);
@@ -101,35 +126,52 @@ namespace QuanLySoTietKiem.Controllers
         }
         private async Task<BaoCaoNgay> GenerateDailyReport(DateTime date)
         {
-            // Get transactions for the specified date
-            var transactions = await _context.GiaoDichs
-                .Include(g => g.SoTietKiem)
-                .ThenInclude(s => s.LoaiSoTietKiem)
-                .Where(g => g.NgayGiaoDich.Date == date.Date)
-                .ToListAsync();
-
-            // Calculate totals
-            decimal tongTienGui = transactions
-                .Where(t => t.MaLoaiGiaoDich == 2) // Mã 2 là giao dịch gửi tiền
-                .Sum(t => (decimal)t.SoTien);
-
-            decimal tongTienRut = transactions
-                .Where(t => t.MaLoaiGiaoDich == 1) // Mã 1 là giao dịch rút tiền  
-                .Sum(t => (decimal)t.SoTien);
-
-            var report = new BaoCaoNgay
+            try
             {
-                Ngay = date,
-                TongTienGui = tongTienGui,
-                TongTienRut = tongTienRut,
-                NgayTaoBaoCao = DateTime.Now
-            };
+                // Get transactions for the specified date
+                var transactions = await _context.GiaoDichs
+                    .Include(g => g.SoTietKiem)
+                    .ThenInclude(s => s.LoaiSoTietKiem)
+                    .Where(g => g.NgayGiaoDich.Date == date.Date)
+                    .ToListAsync();
 
-            return report;
+                // Calculate totals
+                decimal tongTienGui = transactions
+                    .Where(t => t.MaLoaiGiaoDich == 2) // Mã 2 là giao dịch gửi tiền
+                    .Sum(t => (decimal)t.SoTien);
+
+                decimal tongTienRut = transactions
+                    .Where(t => t.MaLoaiGiaoDich == 1) // Mã 1 là giao dịch rút tiền  
+                    .Sum(t => (decimal)t.SoTien);
+
+                // Tạo báo cáo mới
+                var report = new BaoCaoNgay
+                {
+                    Ngay = date,
+                    TongTienGui = tongTienGui,
+                    TongTienRut = tongTienRut,
+                    NgayTaoBaoCao = DateTime.Now,
+                    MaLoaiSo = 1 // Mặc định là loại sổ 1, có thể điều chỉnh theo yêu cầu
+                };
+
+                return report;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tạo báo cáo ngày: {Message}", ex.Message);
+                // Trả về báo cáo trống nếu có lỗi
+                return new BaoCaoNgay
+                {
+                    Ngay = date,
+                    TongTienGui = 0,
+                    TongTienRut = 0,
+                    NgayTaoBaoCao = DateTime.Now,
+                    MaLoaiSo = 1
+                };
+            }
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ExportToPdf(DateTime date)
         {
             var report = await GenerateDailyReport(date);
@@ -163,7 +205,6 @@ namespace QuanLySoTietKiem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ExportToExcel(DateTime date)
         {
             var report = await GenerateDailyReport(date);
@@ -205,7 +246,6 @@ namespace QuanLySoTietKiem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ReportByMonth()
         {
             var today = DateTime.Today;
@@ -214,7 +254,6 @@ namespace QuanLySoTietKiem.Controllers
 
         }
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ReportByMonth(int month, int year)
         {
             var report = await GenerateMonthlyReport(month, year);
@@ -257,8 +296,8 @@ namespace QuanLySoTietKiem.Controllers
             };
             return report;
         }
+
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ExportMonthlyReportToPdf(int month, int year)
         {
             var report = await GenerateMonthlyReport(month, year);
@@ -293,41 +332,446 @@ namespace QuanLySoTietKiem.Controllers
             }
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+
         public IActionResult ThayDoiQuyDinh()
         {
             return View();
         }
+
         private async Task<(List<decimal> deposits, List<decimal> withdrawals)> GetTransactionDataByMonth()
         {
             var currentYear = DateTime.Now.Year;
             var deposits = new List<decimal>();
             var withdrawals = new List<decimal>();
-
             for (int month = 1; month <= 12; month++)
             {
                 var startDate = new DateTime(currentYear, month, 1);
                 var endDate = startDate.AddMonths(1).AddDays(-1);
 
-                // Tính tổng tiền gửi trong tháng
-                var monthlyDeposits = await _context.GiaoDichs
+                /*Tính tổng tiền gửi trong tháng*/
+                /*var monthlyDeposits = await _context.GiaoDichs
                     .Where(g => g.NgayGiaoDich.Month == month
                             && g.NgayGiaoDich.Year == currentYear
                             && g.MaLoaiGiaoDich == 2) // 2 là mã giao dịch gửi tiền
-                    .SumAsync(g => (decimal)g.SoTien);
+                    .Select(g => g.SoTien)
+                    .DefaultIfEmpty(0)
+                    .SumAsync()*/
+                ;
 
                 // Tính tổng tiền rút trong tháng
-                var monthlyWithdrawals = await _context.GiaoDichs
+                /*var monthlyWithdrawals = await _context.GiaoDichs
                     .Where(g => g.NgayGiaoDich.Month == month
                             && g.NgayGiaoDich.Year == currentYear
                             && g.MaLoaiGiaoDich == 1) // 1 là mã giao dịch rút tiền
-                    .SumAsync(g => (decimal)g.SoTien);
+                    .Select(g => g.SoTien)
+                    .DefaultIfEmpty(0)
+                    .SumAsync();*/
 
-                deposits.Add(monthlyDeposits);
-                withdrawals.Add(monthlyWithdrawals);
+                //deposits.Add(Convert.ToDecimal(monthlyDeposits));
+                //withdrawals.Add(Convert.ToDecimal(monthlyWithdrawals));
             }
 
             return (deposits, withdrawals);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,Email,PhoneNumber,FullName,Address,CCCD")] ApplicationUser model)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Get the existing user from the database
+                    var user = await _userManager.FindByIdAsync(id);
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update user properties
+                    user.UserName = model.UserName;
+                    user.Email = model.Email;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.FullName = model.FullName;
+                    user.Address = model.Address;
+                    user.CCCD = model.CCCD;
+
+                    // Save changes
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User {UserId} updated successfully by admin", id);
+                        return RedirectToAction(nameof(UserList));
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    _logger.LogError(ex, "Concurrency error occurred while updating user {UserId}", id);
+                    if (!await UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return View(model);
+        }
+
+        // GET: Admin/Details/5
+        [HttpGet]
+        public async Task<IActionResult> Details(string? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        // GET: Admin/Delete/5
+        [HttpGet]
+        public async Task<IActionResult> Delete(string? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        // POST: Admin/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                // Check if user has any related data before deletion
+                var hasTransactions = await _context.GiaoDichs.AnyAsync(g => g.UserId == id);
+                var hasSavingsAccounts = await _context.SoTietKiems.AnyAsync(s => s.UserId == id);
+
+                if (hasTransactions || hasSavingsAccounts)
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa người dùng này vì họ có giao dịch hoặc sổ tiết kiệm liên quan.";
+                    return RedirectToAction(nameof(UserList));
+                }
+
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User {UserId} deleted successfully by admin", id);
+                    TempData["SuccessMessage"] = "Xóa người dùng thành công.";
+                    return RedirectToAction(nameof(UserList));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting user {UserId}", id);
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi xóa người dùng. Vui lòng thử lại sau.";
+                return RedirectToAction(nameof(UserList));
+            }
+        }
+
+        private async Task<bool> UserExists(string id)
+        {
+            return await _userManager.FindByIdAsync(id) != null;
+        }
+
+        // GET: Admin/ManageRoles
+        [HttpGet]
+        public async Task<IActionResult> ManageRoles(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy người dùng.";
+                return RedirectToAction(nameof(UserList));
+            }
+
+            // Lấy tất cả roles trong hệ thống
+            var roles = _roleManager.Roles.ToList();
+            // Lấy roles hiện tại của user
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var model = new ManageUserRolesViewModel
+            {
+                UserId = userId,
+                UserName = user.UserName,
+                Roles = roles.Select(r => new RoleViewModel
+                {
+                    RoleId = r.Id,
+                    RoleName = r.Name,
+                    IsSelected = userRoles.Contains(r.Name)
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+        // POST: Admin/ManageRoles
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageRoles(ManageUserRolesViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy người dùng.";
+                return RedirectToAction(nameof(UserList));
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var allRoles = _roleManager.Roles.ToList();
+
+            try
+            {
+                foreach (var role in model.Roles)
+                {
+                    // Nếu role được chọn và user chưa có role đó
+                    if (role.IsSelected && !userRoles.Contains(role.RoleName))
+                    {
+                        await _userManager.AddToRoleAsync(user, role.RoleName);
+                    }
+                    // Nếu role không được chọn và user đang có role đó
+                    else if (!role.IsSelected && userRoles.Contains(role.RoleName))
+                    {
+                        // Kiểm tra nếu đây là Admin role và user là admin cuối cùng
+                        if (role.RoleName == RoleConstants.Admin)
+                        {
+                            var adminUsers = await _userManager.GetUsersInRoleAsync(RoleConstants.Admin);
+                            if (adminUsers.Count == 1 && adminUsers.First().Id == user.Id)
+                            {
+                                TempData["ErrorMessage"] = "Không thể xóa quyền Admin của người dùng cuối cùng.";
+                                return RedirectToAction(nameof(ManageRoles), new { userId = model.UserId });
+                            }
+                        }
+                        await _userManager.RemoveFromRoleAsync(user, role.RoleName);
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Cập nhật quyền thành công.";
+                return RedirectToAction(nameof(UserList));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi cập nhật quyền cho user {UserId}: {Message}", model.UserId, ex.Message);
+                TempData["ErrorMessage"] = $"Lỗi khi cập nhật quyền: {ex.Message}";
+                return RedirectToAction(nameof(ManageRoles), new { userId = model.UserId });
+            }
+        }
+
+        // GET: Admin/RoleList
+        [HttpGet]
+        public IActionResult RoleList()
+        {
+            var roles = _roleManager.Roles.ToList();
+            return View(roles);
+        }
+
+        // GET: Admin/CreateRole
+        [HttpGet]
+        public IActionResult CreateRole()
+        {
+            return View();
+        }
+
+        // POST: Admin/CreateRole
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateRole([Bind("Name")] IdentityRole role)
+        {
+            if (ModelState.IsValid)
+            {
+                var roleExists = await _roleManager.RoleExistsAsync(role.Name);
+                if (roleExists)
+                {
+                    TempData["ErrorMessage"] = "Quyền này đã tồn tại.";
+                    return View(role);
+                }
+
+                var result = await _roleManager.CreateAsync(role);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Tạo quyền mới thành công.";
+                    return RedirectToAction(nameof(RoleList));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            return View(role);
+        }
+
+        // GET: Admin/EditRole/5
+        [HttpGet]
+        public async Task<IActionResult> EditRole(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            return View(role);
+        }
+
+        // POST: Admin/EditRole/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditRole(string id, [Bind("Id,Name")] IdentityRole role)
+        {
+            if (id != role.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingRole = await _roleManager.FindByIdAsync(id);
+                    if (existingRole == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingRole.Name = role.Name;
+                    var result = await _roleManager.UpdateAsync(existingRole);
+                    if (result.Succeeded)
+                    {
+                        TempData["SuccessMessage"] = "Cập nhật quyền thành công.";
+                        return RedirectToAction(nameof(RoleList));
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await RoleExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return View(role);
+        }
+
+        // GET: Admin/DeleteRole/5
+        [HttpGet]
+        public async Task<IActionResult> DeleteRole(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            return View(role);
+        }
+
+        // POST: Admin/DeleteRole/5
+        [HttpPost, ActionName("DeleteRole")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRoleConfirmed(string id)
+        {
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            // Kiểm tra xem có phải role Admin không
+            if (role.Name == RoleConstants.Admin)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa quyền Admin.";
+                return RedirectToAction(nameof(RoleList));
+            }
+
+            try
+            {
+                var result = await _roleManager.DeleteAsync(role);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Xóa quyền thành công.";
+                    return RedirectToAction(nameof(RoleList));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xóa quyền {RoleId}: {Message}", id, ex.Message);
+                TempData["ErrorMessage"] = $"Lỗi khi xóa quyền: {ex.Message}";
+            }
+
+            return View(role);
+        }
+
+        private async Task<bool> RoleExists(string id)
+        {
+            return await _roleManager.FindByIdAsync(id) != null;
         }
     }
 }

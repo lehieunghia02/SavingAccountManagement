@@ -1,13 +1,13 @@
-﻿using Helpers;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Models.RutTien;
 using QuanLySoTietKiem.Data;
 using QuanLySoTietKiem.Entity;
+using QuanLySoTietKiem.Helpers;
 using QuanLySoTietKiem.Models;
+using QuanLySoTietKiem.Models.RutTien;
 using QuanLySoTietKiem.Models.SavingsAccount;
 using QuanLySoTietKiem.Services.Interfaces;
 
@@ -290,7 +290,7 @@ namespace QuanLySoTietKiem.Controllers
                 return RedirectToAction("Login", "Account");
             }
             var soTietKiem = await _context.SoTietKiems.FirstOrDefaultAsync(m => m.MaSoTietKiem == id);
-            if (!IsAddMoney(DateTime.Now, soTietKiem.NgayDaoHan))
+            if (!IsAddMoney(DateTime.Now, soTietKiem?.NgayDaoHan ?? DateTime.Now))
             {
                 TempData["Message"] = "Chưa tới ngày đáo hạn để nạp thêm tiền 😊";
                 return RedirectToAction("Index");
@@ -363,7 +363,7 @@ namespace QuanLySoTietKiem.Controllers
                     MaSoTietKiem = model.MaSoTietKiem,
                     MaLoaiGiaoDich = 2,
                     NgayGiaoDich = DateTime.Now,
-                    SoTien = (double)model.SoTienGui,
+                    SoTien = (decimal)model.SoTienGui,
                 };
                 await _context.GiaoDichs.AddAsync(giaoDich);
                 await _context.SaveChangesAsync();
@@ -511,7 +511,7 @@ namespace QuanLySoTietKiem.Controllers
                     MaSoTietKiem = model.MaSoTietKiem,
                     MaLoaiGiaoDich = 1, // 1 là mã loại giao dịch rút tiền
                     NgayGiaoDich = DateTime.Now,
-                    SoTien = (double)model.SoTienRut
+                    SoTien = (decimal)model.SoTienRut
                 };
 
                 // Nếu rút hết, đóng sổ
@@ -534,25 +534,6 @@ namespace QuanLySoTietKiem.Controllers
                 ModelState.AddModelError("", "Có lỗi xảy ra khi rút tiền. Vui lòng thử lại sau.");
                 return View(model);
             }
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> DeleteSavingsAccount(int id)
-        {
-            /*var soTietKiem = await _context.SoTietKiems.FindAsync(id);
-            if (soTietKiem == null)
-                return NotFound();
-            if (soTietKiem.TrangThai)
-            {
-                ModelState.AddModelError("", "Sổ tiết kiệm đang hoạt động, không thể xóa");
-                return View("Details", soTietKiem);
-            }
-
-            _context.SoTietKiems.Remove(soTietKiem);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));*/
-            return null; 
         }
     }
 }

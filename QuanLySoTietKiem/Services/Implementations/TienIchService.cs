@@ -1,4 +1,4 @@
-using Helpers;
+using QuanLySoTietKiem.Helpers;
 using QuanLySoTietKiem.Models.SoSanhGoiTietKiem;
 using QuanLySoTietKiem.Repositories.Interfaces;
 using QuanLySoTietKiem.Services.Interfaces;
@@ -10,6 +10,7 @@ namespace QuanLySoTietKiem.Services.Implementations
     private readonly ILaiSuatDuKienRepository _laiSuatDuKienRepo;
     private readonly ILoaiSoTietKiemRepository _loaiSoTietKiemRepo;
     private readonly ILogger<TienIchService> _logger;
+
     public TienIchService(ILaiSuatDuKienRepository laiSuatDuKienRepo, ILoaiSoTietKiemRepository loaiSoTietKiemRepo, ILogger<TienIchService> logger)
     {
       _laiSuatDuKienRepo = laiSuatDuKienRepo;

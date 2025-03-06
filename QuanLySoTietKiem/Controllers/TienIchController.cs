@@ -67,7 +67,7 @@ namespace QuanLySoTietKiem.Controllers
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, "Lỗi khi lập kế hoạch tiết kiệm");
+        _logger.LogError(ex, "Error when creating a savings plan");
         ModelState.AddModelError("", "Có lỗi xảy ra khi lập kế hoạch. Vui lòng thử lại.");
         return View(model);
       }

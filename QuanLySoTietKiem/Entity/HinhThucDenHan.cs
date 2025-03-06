@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QuanLySoTietKiem.Models;
+namespace QuanLySoTietKiem.Entity;
 
 public class HinhThucDenHan
 {

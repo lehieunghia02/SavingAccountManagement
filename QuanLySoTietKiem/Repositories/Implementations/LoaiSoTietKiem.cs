@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLySoTietKiem.Data;
+using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Repositories.Interfaces;
 

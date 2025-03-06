@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
 
 namespace QuanLySoTietKiem.Data;

@@ -1,5 +1,5 @@
-using Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using QuanLySoTietKiem.Helpers;
 using QuanLySoTietKiem.Models.LaiSuatDuKien;
 using QuanLySoTietKiem.Repositories.Interfaces;
 using QuanLySoTietKiem.Services.Interfaces;
@@ -12,8 +12,9 @@ namespace QuanLySoTietKiem.Services.Implementations
     private readonly ILaiSuatDuKienRepository _laiSuatDuKienRepository;
     private readonly ILoaiSoTietKiemRepository _loaiSoTietKiemRepository;
 
-    public LaiSuatDuKienService(ILaiSuatDuKienRepository laiSuatDuKienRepository, ILoaiSoTietKiemRepository loaiSoTietKiemRepository)
+    public LaiSuatDuKienService(ILogger<LaiSuatDuKienService> logger, ILaiSuatDuKienRepository laiSuatDuKienRepository, ILoaiSoTietKiemRepository loaiSoTietKiemRepository)
     {
+      _logger = logger;
       _laiSuatDuKienRepository = laiSuatDuKienRepository;
       _loaiSoTietKiemRepository = loaiSoTietKiemRepository;
     }
