@@ -1,13 +1,13 @@
 @{
-  ViewData["Title"] = "Dashboard";
+  ViewData["Title"] = "Trang quản trị";
   Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container mt-4">
-  <h1 class="text-center mb-4">Trang quản lý hệ thống</h1>
+    <h1 class="text-center mb-4">Trang quản lý hệ thống</h1>
 
-  <div class="row">
-    @* <!-- Dashboard Cards -->
+    <div class="row">
+        @* <!-- Dashboard Cards -->
     <div class="col-md-4 mb-4">
       <div class="card">
         <div class="card-body">
@@ -18,28 +18,30 @@
       </div>
     </div> *@
 
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Báo cáo</h5>
-          <p class="card-text">Xem báo cáo hệ thống</p>
-          <a asp-controller="Admin" asp-action="ReportByDay" class="btn btn-primary">Xem báo cáo</a>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Báo cáo</h5>
+                    <p class="card-text">Xem báo cáo hệ thống</p>
+                    <a asp-controller="Admin" asp-action="ReportByDay" class="btn btn-primary">Xem báo cáo</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <!-- Add Chart Section -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Thống kê tiền gửi và tiền rút</h5>
-            <canvas id="transactionChart"></canvas>
-          </div>
+        <!-- Add Chart Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Thống kê tiền gửi và tiền rút</h5>
+                        <canvas id="transactionChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
+
+
 @section Scripts {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>

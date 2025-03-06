@@ -1,61 +1,273 @@
 ﻿@model QuanLySoTietKiem.Models.AccountModels.LoginModel.LoginModel
 @{
     ViewData["Title"] = "Đăng nhập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Đăng nhập</h2>
-    <div class="card shadow-sm" style="max-width: 400px; margin: auto;">
-        <div class="card-body">
-            @using (Html.BeginForm("Login", "Account", FormMethod.Post))
-            {
-                @Html.AntiForgeryToken()
-                <div class="form-group mb-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Nhập tên đăng nhập" })
+<style>
+    .login-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, rgba(30, 60, 114, 0.9), rgba(42, 82, 152, 0.8)), 
+                    url('https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+    
+    .login-container {
+        max-width: 900px;
+        width: 100%;
+    }
+
+    .login-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        background: white;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 25px;
+        text-align: center;
+        color: white;
+    }
+
+    .login-header h2 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .login-body {
+        padding: 40px;
+    }
+
+    .login-image {
+        background-image: url('https://images.unsplash.com/photo-1633158829875-e5316a358c6f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+        background-size: cover;
+        background-position: center;
+        min-height: 100%;
+        border-radius: 0 20px 20px 0;
+        position: relative;
+    }
+
+    .login-image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(30, 60, 114, 0.7), rgba(42, 82, 152, 0.4));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+        color: white;
+        text-align: center;
+    }
+
+    .login-image-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-image-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        height: 50px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding-left: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #1e3c72;
+        box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.15);
+    }
+
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-right: none;
+        color: #6c757d;
+        width: 50px;
+        justify-content: center;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .input-group-text.password-toggle {
+        border-radius: 0 10px 10px 0;
+        border-left: none;
+        border-right: 1px solid #e0e0e0;
+        cursor: pointer;
+    }
+
+    .btn-login {
+        height: 50px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        border: none;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        box-shadow: 0 5px 15px rgba(30, 60, 114, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+    }
+
+    .login-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .login-link {
+        color: #1e3c72;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .login-link:hover {
+        color: #2a5298;
+        text-decoration: underline;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-top: 0.2rem;
+    }
+
+    .form-check-label {
+        padding-left: 5px;
+        font-size: 0.95rem;
+        color: #6c757d;
+    }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    @* @media (max-width: 991px) {
+        .login-image {
+            display: none;
+        }
+        
+        .login-card {
+            border-radius: 20px;
+        }
+    } *@
+</style>
+
+<div class="login-page">
+    <div class="container login-container">
+        <div class="login-card">
+            <div class="row g-0">
+                <div class="col-lg-6">
+                    <div class="login-header d-lg-none">
+                        <h2>Đăng nhập</h2>
                     </div>
-                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
-                </div>
-                <div class="form-group mb-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu", id = "password" })
-                        <span class="input-group-text" onclick="togglePasswordVisibility()">
-                            <i class="bi bi-eye-fill" id="togglePasswordIcon"></i>
-                        </span>
+                    <div class="login-body">
+                        <h3 class="mb-4 d-none d-lg-block">Chào mừng trở lại!</h3>
+                        <p class="text-muted mb-4 d-none d-lg-block">Vui lòng đăng nhập để truy cập vào tài khoản của bạn</p>
+                        
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label class="form-label">Tên đăng nhập</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Nhập tên đăng nhập" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Mật khẩu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu", id = "password" })
+                                    <span class="input-group-text password-toggle" onclick="togglePasswordVisibility()">
+                                        <i class="bi bi-eye-fill" id="togglePasswordIcon"></i>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                            </div>
+                            
+                            <div class="form-check mb-4">
+                                <input type="checkbox" name="RememberMe" id="RememberMe" class="form-check-input" />
+                                <label for="RememberMe" class="form-check-label">
+                                    Ghi nhớ đăng nhập
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-login w-100">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Đăng nhập
+                                </button>
+                            </div>
+                            
+                            <div class="login-links">
+                                <a asp-action="ForgotPassword" asp-controller="Account" class="login-link">
+                                    <i class="bi bi-key-fill me-1"></i> Quên mật khẩu?
+                                </a>
+                                <a asp-action="Register" asp-controller="Account" class="login-link">
+                                    <i class="bi bi-person-plus-fill me-1"></i> Đăng ký tài khoản
+                                </a>
+                            </div>
+                            
+                            <div class="text-danger mt-4">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            </div>
+                        }
                     </div>
-                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
-                <div class="form-check mb-3">
-                    <input type="checkbox" name="RememberMe" id="RememberMe" class="form-check-input" />
-                    <label for="RememberMe" class="form-check-label">
-                        RememberMe
-                    </label>
+                <div class="col-lg-6">
+                    <div class="login-image">
+                        <div class="login-image-overlay">
+                            <h3 class="login-image-title">Quản Lý Sổ Tiết Kiệm</h3>
+                            <p class="login-image-text">Giải pháp quản lý tài chính hiệu quả, an toàn và tiện lợi. Tối ưu hóa lợi nhuận từ tiết kiệm của bạn.</p>
+                            <img src="~/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
-                    </button>
-                </div>
-                @* <div class="mt-3 text-center">
-                    <a asp-action="ForgotPassword" asp-controller="Account" class="text-decoration-none">
-                        <i class="bi bi-key-fill"></i> Quên mật khẩu?
-                    </a>
-                </div> *@
-                @* Nếu chưa có tài khoản thì đăng ký *@
-                <div class="mt-3 text-center">
-                    <a asp-action="Register" asp-controller="Account" class="text-decoration-none">
-                        <i class="bi bi-person-fill"></i> Register
-                    </a>
-                </div>
-                <div class="text-danger mt-3">
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                </div>
-            }
+            </div>
         </div>
     </div>
 </div>
+
 <script>
     function togglePasswordVisibility() {
         var passwordField = document.getElementById("password");

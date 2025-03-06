@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers;
+namespace QuanLySoTietKiem.Controllers;
 public class HuongDanController : Controller
 {
   public IActionResult Index()

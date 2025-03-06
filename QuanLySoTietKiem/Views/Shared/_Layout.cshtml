@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/QuanLySoTietKiem.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 
@@ -22,12 +23,8 @@
             @RenderBody()
         </main>
     </div>
+    @await Html.PartialAsync("~/Views/Shared/Layouts/Footer.cshtml")
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Saving System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

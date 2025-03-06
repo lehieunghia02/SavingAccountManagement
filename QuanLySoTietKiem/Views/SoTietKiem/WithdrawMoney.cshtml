@@ -1,4 +1,4 @@
-@model Models.RutTien.WithdrawMoneyViewModel
+@*@model QuanLySoTietKiem.Models.SoTietKiem;
 @{
   ViewData["Title"] = "Rút tiền";
   Layout = "~/Views/Shared/_UserLayout.cshtml";
@@ -114,10 +114,10 @@
             }
           </li>
           <li><strong>Số dư hiện tại:</strong> @Model.SoDuHienTai.ToString("N0") VNĐ</li>
-          @* <li><strong>Ngày mở sổ:</strong> @Model.NgayMoSo.ToString("dd/MM/yyyy")</li> *@
-          @* <li><strong>Ngày đáo hạn:</strong> @Model.NgayDaoHan.ToString("dd/MM/yyyy")</li> *@
+          $1$ <li><strong>Ngày mở sổ:</strong> @Model.NgayMoSo.ToString("dd/MM/yyyy")</li> #1#
+          $1$ <li><strong>Ngày đáo hạn:</strong> @Model.NgayDaoHan.ToString("dd/MM/yyyy")</li> #1#
           <li><strong>Lãi suất:</strong> @Model.LaiSuatKyHan.ToString("P1")</li>
-          @* <li><strong>Lãi suất áp dụng:</strong> @ViewBag.LaiSuatApDung%/năm</li> *@
+          $1$ <li><strong>Lãi suất áp dụng:</strong> @ViewBag.LaiSuatApDung%/năm</li> #1#
           <li><strong>Tiền lãi:</strong> @ViewBag.TienLai.ToString("N0") VNĐ</li>
           <li><strong>Tổng tiền nhận được (gốc + lãi):</strong> @ViewBag.TongTienNhanDuoc.ToString("N0") VNĐ</li>
         </ul>
@@ -135,7 +135,7 @@
       {
         <form asp-action="WithdrawMoney" method="post" class="mt-4">
           @Html.AntiForgeryToken()
-          <input type="hidden" asp-for="MaSoTietKiem" />
+          <input type="hidden" asp-for="maSoTietKiem" />
 
           <div class="mb-4">
             <label asp-for="SoTienRut" class="form-label fw-bold text-success">
@@ -296,4 +296,4 @@
       }
     });
   </script>
-}
+}*@

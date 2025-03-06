@@ -1,132 +1,44 @@
-﻿@model QuanLySoTietKiem.Models.ApplicationUser
+﻿@using iTextSharp.text.pdf.qrcode
+@model QuanLySoTietKiem.Entity.ApplicationUser
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "Trang cá nhân";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
-
-<style>
-    .profile-card {
-        transition: all 0.3s ease;
-        border: none;
-        border-radius: 15px;
-    }
-
-    .profile-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border-radius: 15px 15px 0 0;
-        padding: 2rem;
-    }
-
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        padding: 4px;
-        background: white;
-    }
-
-    .info-group {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .info-group:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .info-label {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .info-value {
-        color: #212529;
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
-
-    .balance-card {
-        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
-        color: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-top: 1rem;
-    }
-</style>
+@*Link to css*@
+<link rel="stylesheet" href="~/css/user/profile/profile.css">
 
 <div class="container mt-5 animate__animated animate__fadeIn">
     <div class="row justify-content-center g-4">
         <div class="col-md-10">
             <div class="card profile-card shadow-lg">
                 <div class="profile-header text-white">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center"> 
                         <div class="text-center w-100">
-                            <div class="mb-3 d-flex justify-content-center">
-                                <div class="profile-avatar d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-person-circle display-4"></i>
-                                </div>
+
+                            @* Avatar với link *@
+                            <div class="mb-3">
+                                @if (Model.AvatarUrl == null)
+                                {
+                                    <img src="https://img.freepik.com/premium-vector/young-smiling-man-adam-avatar-3d-vector-people-character-illustration-cartoon-minimal-style_365941-687.jpg" alt="Avatar" class="rounded-circle"
+                                         style="width: 120px; height: 120px; object-fit: cover;"/>
+                                }
+                                else
+                                {
+                                    <img src="@Model.AvatarUrl" alt="Avatar" class="rounded-circle"
+                                         style="width: 120px; height: 120px; object-fit: cover;"/>
+                                }
                             </div>
-                            <h2 class="mb-2">@Model.FullName</h2>
-                            <p class="mb-0 opacity-75">@Model.Email</p>
+                            @* Tên và email *@
+                            <div class="text-center">
+                                <h2 class="mb-2">@Model.FullName</h2>
+                                <p class="mb-0 opacity-75">@Model.Email</p>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-4">
-                    <!-- Thông tin tài khoản -->
-                    <div class="balance-card mb-4 animate__animated animate__fadeInUp">
-                        <div class="text-center">
-                            <h5 class="mb-3 opacity-75">Số dư tài khoản</h5>
-                            <h2 class="mb-0">@Model.SoDuTaiKhoan.ToString("C0", new
-                                System.Globalization.CultureInfo("vi-VN"))</h2>
-                        </div>
-                    </div>
-
-                    <!-- Thông tin cá nhân -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="info-group animate__animated animate__fadeInLeft">
-                                <div class="info-label">
-                                    <i class="bi bi-person-badge me-2"></i>Căn cước công dân
-                                </div>
-                                <div class="info-value">@Model.CCCD</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="info-group animate__animated animate__fadeInRight">
-                                <div class="info-label">
-                                    <i class="bi bi-telephone me-2"></i>Số điện thoại
-                                </div>
-                                <div class="info-value">@Model.PhoneNumber</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="info-group animate__animated animate__fadeInLeft" style="animation-delay: 0.2s">
-                                <div class="info-label">
-                                    <i class="bi bi-geo-alt me-2"></i>Địa chỉ
-                                </div>
-                                <div class="info-value">@Model.Address</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="info-group animate__animated animate__fadeInRight"
-                                style="animation-delay: 0.2s">
-                                <div class="info-label">
-                                    <i class="bi bi-person me-2"></i>Tên đăng nhập
-                                </div>
-                                <div class="info-value">@Model.UserName</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @* Thông tin cá nhân *@
+                @await Html.PartialAsync("Sections/User/Profile/_UserInfoSection", Model)
                 <div class="card-footer bg-light p-4 text-center">
                     <div class="d-flex justify-content-center gap-3">
                         <a href="/User/EditProfile" class="btn btn-success btn-lg">

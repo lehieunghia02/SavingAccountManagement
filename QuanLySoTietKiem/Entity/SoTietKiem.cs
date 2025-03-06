@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using QuanLySoTietKiem.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QuanLySoTietKiem.Models
+namespace QuanLySoTietKiem.Entity
 {
     public class SoTietKiem
     {

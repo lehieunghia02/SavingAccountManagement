@@ -55,12 +55,6 @@ namespace QuanLySoTietKiem.Data
                 MaLoaiGiaoDich = 2,
                 TenLoaiGiaoDich = "Gửi tiền"
             });
-
-
-
-
-
-
         }
     }
 }

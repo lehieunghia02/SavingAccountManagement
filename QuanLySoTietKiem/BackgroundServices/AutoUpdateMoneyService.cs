@@ -2,10 +2,11 @@ using QuanLySoTietKiem.BackgroundServices.Interfaces;
 
 namespace QuanLySoTietKiem.BackgroundServices
 {
-  public class AutoUpdateMoneyService(IServiceProvider serviceProvider, ILogger<AutoUpdateMoneyService> logger) : BackgroundService
+  public class AutoUpdateMoneyService(
+      IServiceProvider serviceProvider, 
+      ILogger<AutoUpdateMoneyService> logger
+      ) : BackgroundService
   {
- 
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
       while (!stoppingToken.IsCancellationRequested)

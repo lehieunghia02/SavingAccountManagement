@@ -1,4 +1,4 @@
-namespace QuanLySoTietKiem.Models
+namespace QuanLySoTietKiem.Entity
 {
     public class ErrorViewModel
     {

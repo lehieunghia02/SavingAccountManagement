@@ -17,17 +17,17 @@ public class GiaoDichService : IGiaoDichService
     {
         var giaoDich = new GiaoDich
         {
-                MaSoTietKiem = model.MaSoTietKiem,
-                MaLoaiGiaoDich = model.MaLoaiGiaoDich,
-                NgayGiaoDich = model.NgayGiaoDich,
-                SoTien = model.SoTien, 
+            MaSoTietKiem = model.MaSoTietKiem,
+            MaLoaiGiaoDich = model.MaLoaiGiaoDich,
+            NgayGiaoDich = model.NgayGiaoDich,
+            SoTien = (decimal)model.SoTien,
         };
         _context.GiaoDichs.Add(giaoDich);
         await _context.SaveChangesAsync();
 
         //Map back to model 
         model.MaGiaoDich = giaoDich.MaGiaoDich;
-        return giaoDich; 
+        return giaoDich;
     }
     public async Task<List<GiaoDich>> GetAllGiaoDichAsync()
     {

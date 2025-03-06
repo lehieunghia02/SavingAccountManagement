@@ -1,60 +1,138 @@
-@model QuanLySoTietKiem.Models.ApplicationUser
 @{
   ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
   Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow">
-        <div class="card-header bg-success text-white">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-pencil-fill fa-2x me-2"></i>
-            <h3 class="mb-0">Chỉnh sửa thông tin cá nhân</h3>
-          </div>
-        </div>
-        <div class="card-body">
-          @using (Html.BeginForm("EditProfile", "User", FormMethod.Post))
-          {
-            @Html.AntiForgeryToken()
-            <div class="mb-3">
-              <label class="form-label fw-bold text-success">
-                <i class="bi bi-person-fill me-2">
+<!-- Sử dụng file CSS riêng thay vì inline styles -->
+<link rel="stylesheet" href="~/css/user/profile/edit-profile.css" />
 
-                </i>Họ và tên
-              </label>
-              @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+      <div class="profile-container">
+        <h2 class="text-center page-title">Thông tin cá nhân</h2>
+        <p class="text-center page-subtitle">Cập nhật thông tin cá nhân của bạn</p>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+          <div class="alert alert-success d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <div>@TempData["SuccessMessage"]</div>
+          </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+          <div class="alert alert-danger d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>@TempData["ErrorMessage"]</div>
+          </div>
+        }
+
+        <div class="profile-card card shadow">
+          <div class="card-header bg-success text-white">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-person-badge fa-2x me-3"></i>
+              <div>
+                <h3 class="mb-0">Chỉnh sửa thông tin cá nhân</h3>
+                <small>Cập nhật thông tin để hoàn thiện hồ sơ của bạn</small>
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-success">
-                <i class="bi bi-envelope-fill me-2"></i>Email
-              </label>
-              @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
+          </div>
+          <div class="card-body p-4">
+            <!-- Avatar with link -->
+            <div class="text-center mb-4">
+              <div class="avatar-container">
+                <a href="@Url.Action("UpdateAvatar", "Account")" title="Cập nhật ảnh đại diện" class="avatar-link">
+                  <img src="@Model.AvatarUrl" alt="Avatar" class="avatar-image"
+                    onerror="this.src='/images/default-avatar.png'" />
+                  <div class="avatar-overlay">
+                    <i class="bi bi-camera-fill"></i>
+                  </div>
+                </a>
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-success">
-                <i class="bi bi-geo-alt-fill me-2"></i>Địa chỉ
-              </label>
-              @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-success">
-                <i class="bi bi-telephone-fill me-2"></i>Số điện thoại
-              </label>
-              @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
-            </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-success">
-                <i class="bi bi-save me-2"></i>Lưu thay đổi
-              </button>
-              <a asp-action="Profile" asp-controller="User" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Trở về trang cá nhân
-              </a>
-            </div>
-          }
+
+            @using (Html.BeginForm("EditProfile", "User", FormMethod.Post, new { @class = "profile-form" }))
+            {
+              @Html.AntiForgeryToken()
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <span class="input-icon">
+                      <i class="bi bi-person-fill"></i>
+                    </span>
+                    <input type="text" class="form-control input-with-icon" name="FullName" id="FullName"
+                      value="@Model.FullName" placeholder="Họ và tên" required />
+
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <span class="input-icon">
+                      <i class="bi bi-envelope-fill"></i>
+                    </span>
+                    <input type="email" class="form-control input-with-icon" name="Email" id="Email" value="@Model.Email"
+                      readonly placeholder="Email" />
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <span class="input-icon">
+                      <i class="bi bi-geo-alt-fill"></i>
+                    </span>
+                    <input type="text" class="form-control input-with-icon" name="Address" id="Address"
+                      value="@Model.Address" placeholder="Địa chỉ" />
+
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <span class="input-icon">
+                      <i class="bi bi-telephone-fill"></i>
+                    </span>
+                    <input type="tel" class="form-control input-with-icon" name="PhoneNumber" id="PhoneNumber"
+                      value="@Model.PhoneNumber" placeholder="Số điện thoại" />
+
+                  </div>
+                </div>
+              </div>
+
+              <input type="hidden" name="AvatarUrl" value="@Model.AvatarUrl" />
+
+              <div class="button-container">
+                <a asp-action="Profile" asp-controller="User" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left me-2"></i>Trở về
+                </a>
+                <button type="submit" class="btn btn-success">
+                  <i class="bi bi-save me-2"></i>Lưu thay đổi
+                </button>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+@section Scripts {
+  <script>
+    // Hiệu ứng khi trang tải xong
+    document.addEventListener('DOMContentLoaded', function () {
+      // Thêm class để kích hoạt animation cho form
+      document.querySelector('.profile-form').classList.add('loaded');
+
+      // Tự động focus vào trường đầu tiên
+      setTimeout(function () {
+        document.getElementById('FullName').focus();
+      }, 500);
+    });
+  </script>
+
+  @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+  }
+}

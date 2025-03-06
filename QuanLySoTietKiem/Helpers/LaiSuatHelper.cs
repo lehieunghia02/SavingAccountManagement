@@ -1,5 +1,6 @@
 using System.Diagnostics;
-namespace Helpers;
+
+namespace QuanLySoTietKiem.Helpers;
 public static class LaiSuatHelper
 {
   public const decimal LAI_SUAT_KHONG_KY_HAN = 0.5m;

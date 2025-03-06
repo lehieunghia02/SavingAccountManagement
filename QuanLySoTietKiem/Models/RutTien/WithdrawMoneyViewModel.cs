@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Models.RutTien;
+namespace QuanLySoTietKiem.Models.RutTien;
 public class WithdrawMoneyViewModel
 {
   public int MaSoTietKiem { get; set; } = 0;

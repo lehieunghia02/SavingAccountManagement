@@ -1,17 +1,11 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using QuanLySoTietKiem.Data;
 using QuanLySoTietKiem.Entity;
-using QuanLySoTietKiem.Models;
 
-namespace Helpers;
+namespace QuanLySoTietKiem.Helpers;
 public static class DaoHanHelper
 {
   public static async Task XuLyDaoHan(SoTietKiem soTietKiem, decimal tienLai, ApplicationDbContext context)
   {
-    Debug.WriteLine("MaHinhThucDenHan: " + soTietKiem.MaHinhThucDenHan);
-
-    // Lấy thông tin user
     var user = await context.Users.FindAsync(soTietKiem.UserId);
     if (user == null)
       throw new Exception("Không tìm thấy thông tin người dùng");
@@ -34,33 +28,31 @@ public static class DaoHanHelper
 
   private static async Task RutHet(SoTietKiem soTietKiem, decimal tienLai, ApplicationUser user, ApplicationDbContext context)
   {
-    Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>Rút hết");
 
     // Cộng tiền gốc và lãi vào tài khoản
     user.SoDuTaiKhoan += (double)(soTietKiem.SoDuSoTietKiem + tienLai);
 
-    //Đóng sổ 
-    soTietKiem.TrangThai = false;
     soTietKiem.NgayDongSo = DateTime.Now;
     soTietKiem.SoDuSoTietKiem = 0;
+    soTietKiem.TrangThai = false;
 
     // Lưu thay đổi
-    context.Users.Update(user);
-    context.SoTietKiems.Update(soTietKiem);
+    context.Users.Update(user); //cập nhật số dư tài khoản 
+    context.SoTietKiems.Update(soTietKiem);  // cập nhật số dư STK 
     await context.SaveChangesAsync();
   }
-
+  //Quay vòng gốc là rút lãi và tạo kỳ hạn mới với số tiền gốc ban đầu 
   private static async Task QuayVongGoc(SoTietKiem soTietKiem, decimal tienLai, ApplicationUser user, ApplicationDbContext context)
   {
-    Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>Quay vòng gốc");
 
     // Cộng tiền lãi vào tài khoản (chỉ rút lãi)
     user.SoDuTaiKhoan += (double)tienLai;
 
     // Tạo kỳ hạn mới với số tiền gốc ban đầu
     soTietKiem.NgayMoSo = DateTime.Now;
-    soTietKiem.NgayDaoHan = soTietKiem.NgayMoSo.AddMonths(soTietKiem.LoaiSoTietKiem.KyHan);
-    soTietKiem.SoDuSoTietKiem = soTietKiem.SoTienGui;
+    var kyHan = soTietKiem.LoaiSoTietKiem.KyHan; 
+    soTietKiem.NgayDaoHan = soTietKiem.NgayMoSo.AddMonths(kyHan);
+    soTietKiem.SoDuSoTietKiem = soTietKiem.SoTienGui; // set lại số dư sổ tiết kiệm là số tiền gửi ban đầu 
 
     // Lưu thay đổi
     context.Users.Update(user);
@@ -70,8 +62,6 @@ public static class DaoHanHelper
 
   private static async Task QuayVongGocVaLai(SoTietKiem soTietKiem, decimal tienLai, ApplicationDbContext context)
   {
-    Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>Quay vòng gốc và lãi");
-
     //Tạo kỳ hạn mới
     soTietKiem.NgayMoSo = DateTime.Now;
     soTietKiem.NgayDaoHan = soTietKiem.NgayMoSo.AddMonths(soTietKiem.LoaiSoTietKiem.KyHan);
